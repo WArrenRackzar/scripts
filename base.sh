@@ -4,3 +4,4 @@ pip3 install --user apt-smart
 echo "export PATH=\$(python3 -c 'import site; print(site.USER_BASE + \"/bin\")'):\$PATH" >> /etc/cloud/apt-smart
 source /etc/cloud/apt-smart
 apt-smart -x http://archive.ubuntu.com/ubuntu -a
+sudo sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
