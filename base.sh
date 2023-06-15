@@ -113,8 +113,14 @@ sudo awk '{
 }' /etc/ssh/sshd_config.bak | sudo tee /etc/ssh/sshd_config > /dev/null
 
 # Restart the SSH service
-if [[ $distro == "ubuntu" || $distro == "debian" ]]; then
-    sudo service ssh restart
-elif [[ $distro == "centos" ]]; then
-    sudo systemctl restart sshd
+if [[ $distro == "ubuntu" || $distro == "debian" || $distro == "centos" ]]; then
+    if command -v service >/dev/null; then
+        sudo service ssh restart
+    elif command -v systemctl >/dev/null; then
+        sudo systemctl restart sshd
+    else
+        echo "Unable to restart SSH service. Please restart it manually."
+    fi
+else
+    echo "Unsupported distribution. SSH service restart may be required."
 fi
