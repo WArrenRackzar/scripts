@@ -97,3 +97,24 @@ elif [[ $distro == "centos" ]]; then
         esac
     fi
 fi
+
+# Backup the original sshd_config file
+sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+
+# Use awk to modify the sshd_config file
+sudo awk '{
+  if ($1 == "#PermitRootLogin" && $2 == "prohibit-password") {
+    print "PermitRootLogin yes";
+  } else if ($1 == "#PasswordAuthentication" && $2 == "yes") {
+    print "PasswordAuthentication yes";
+  } else {
+    print $0;
+  }
+}' /etc/ssh/sshd_config.bak | sudo tee /etc/ssh/sshd_config > /dev/null
+
+# Restart the SSH service
+if [[ $distro == "ubuntu" || $distro == "debian" ]]; then
+    sudo service ssh restart
+elif [[ $distro == "centos" ]]; then
+    sudo systemctl restart sshd
+fi
