@@ -39,7 +39,6 @@ fi
 if [[ $distro == "ubuntu" || $distro == "debian" ]]; then
     apt update
     apt install qemu-guest-agent -y
-    apt-get -y upgrade linux-image-generic
 
     # Check Ubuntu version and install specific kernel
     if [[ $distro == "ubuntu" ]]; then
@@ -55,6 +54,19 @@ if [[ $distro == "ubuntu" || $distro == "debian" ]]; then
                 ;;
             *)
                 echo "Unsupported Ubuntu version: $VERSION_ID"
+                exit 1
+                ;;
+        esac
+    elif [[ $distro == "debian" ]]; then
+        case $VERSION_ID in
+            "10")
+                apt -y install linux-image-5.10.0-0.deb10.23-amd64
+                ;;
+            "11")
+                apt -y install linux-image-6.1.0-0.deb11.7-amd64
+                ;;
+            *)
+                echo "Unsupported Debian version: $VERSION_ID"
                 exit 1
                 ;;
         esac
