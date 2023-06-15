@@ -60,12 +60,6 @@ if [[ $distro == "ubuntu" || $distro == "debian" ]]; then
         esac
     fi
 
-    wget https://raw.githubusercontent.com/WArrenRackzar/scripts/patch-1/base.sh -P /etc/cloud/
-    chmod +x /etc/cloud/base.sh
-    bash /etc/cloud/base.sh
-    rm /etc/cloud/base.sh
-    rm /etc/cloud/apt-smart
-
 elif [[ $distro == "centos" ]]; then
     yum update
     yum install qemu-guest-agent -y
