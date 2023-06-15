@@ -81,3 +81,7 @@ elif [[ $distro == "centos" ]]; then
             *)
                 echo "Unsupported CentOS version: $VERSION_ID"
                 exit 1
+                ;;
+        esac
+    fi
+fi
