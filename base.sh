@@ -30,8 +30,8 @@ pip3 install --user apt-smart
 
 # Configure apt-smart (for Ubuntu and Debian)
 if [[ $distro == "ubuntu" || $distro == "debian" ]]; then
-    echo "export PATH=\$(python3 -c 'import site; print(site.USER_BASE + \"/bin\")'):\$PATH" >> /etc/cloud/apt-smart
-    source /etc/cloud/apt-smart
+    echo "export PATH=\$(python3 -c 'import site; print(site.USER_BASE + \"/bin\")'):\$PATH" >> $HOME/.bashrc
+    source $HOME/.bashrc
     apt-smart -x http://archive.ubuntu.com/ubuntu -a
 fi
 
@@ -96,6 +96,13 @@ elif [[ $distro == "centos" ]]; then
                 ;;
         esac
     fi
+fi
+
+# Add/update nameserver in /etc/resolv.conf
+if grep -q "nameserver 127.0.0.53" /etc/resolv.conf; then
+    sudo sed -i 's/nameserver 127.0.0.53/nameserver 8.8.8.8/' /etc/resolv.conf
+else
+    echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
 fi
 
 # Backup the original sshd_config file
