@@ -38,9 +38,7 @@ fi
 # Run cloud-init commands
 if [[ $distro == "ubuntu" || $distro == "debian" ]]; then
     apt update
-    apt install qemu-guest-agent -y
-
-    # Check Ubuntu version and install specific kernel
+    
     if [[ $distro == "ubuntu" ]]; then
         case $VERSION_ID in
             "18.04")
@@ -51,6 +49,9 @@ if [[ $distro == "ubuntu" || $distro == "debian" ]]; then
                 ;;
             "22.04")
                 apt -y install linux-image-5.19.0-42-generic
+                ;;
+            "23.04")
+                apt install qemu-guest-agent -y
                 ;;
             *)
                 echo "Unsupported Ubuntu version: $VERSION_ID"
@@ -74,28 +75,24 @@ if [[ $distro == "ubuntu" || $distro == "debian" ]]; then
 
 elif [[ $distro == "centos" ]]; then
     yum update
-    yum install qemu-guest-agent -y
 
-    # Check CentOS version and install specific kernel
-    if [[ $distro == "centos" ]]; then
-        case $VERSION_ID in
-            7*)
-                rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
-                rpm -Uvh https://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
-                yum --enablerepo=elrepo-kernel install kernel-ml
-                grub2-set-default 0
-                ;;
-            8*)
-                dnf install https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
-                dnf --enablerepo=elrepo-kernel install kernel-ml
-                grub2-set-default 0
-                ;;
-            *)
-                echo "Unsupported CentOS version: $VERSION_ID"
-                exit 1
-                ;;
-        esac
-    fi
+    case $VERSION_ID in
+        "7"*)
+            rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+            rpm -Uvh https://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+            yum --enablerepo=elrepo-kernel install kernel-ml
+            grub2-set-default 0
+            ;;
+        "8"*)
+            dnf install https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
+            dnf --enablerepo=elrepo-kernel install kernel-ml
+            grub2-set-default 0
+            ;;
+        *)
+            echo "Unsupported CentOS version: $VERSION_ID"
+            exit 1
+            ;;
+    esac
 fi
 
 # Add/update nameserver in /etc/resolv.conf
