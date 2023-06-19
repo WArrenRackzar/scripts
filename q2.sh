@@ -1,28 +1,33 @@
 #!/bin/bash
 
-# Get the filename from the command line.
+COMMON_WORDS=("the" "and" "in")
+
 filename=$1
 
-# Create a list of common English words to exclude.
-stop_words="the and in of to a is that it for on with as at by but from or about"
+if [ ! -f "$filename" ]; then
+  echo "File '$filename' does not exist."
+  exit 1
+fi
 
-# Read the file and split the words into an array.
-words=$(cat $filename | tr -s ' ' '\n' | sort | uniq)
+declare -A word_count
+while read -r line; do
+  words=($line)
 
-# Exclude the common English words from the array.
-for word in $words; do
-  if [[ $stop_words =~ $word ]]; then
-    words=$(echo $words | grep -v "$word")
-  fi
+  for word in "${words[@]}"; do
+    word=$(echo "$word" | tr '[:upper:]' '[:lower:]' | sed 's/[^[:alnum:]]//g')
+
+    if [[ ! " ${COMMON_WORDS[*]} " =~ " ${word} " ]] && [[ -n $word ]]; then
+      ((word_count[$word]++))
+    fi
+  done
+done < "$filename"
+
+sorted_words=()
+for word in "${!word_count[@]}"; do
+  sorted_words+=("$word:${word_count[$word]}")
 done
+sorted_words=($(echo "${sorted_words[@]}" | tr ' ' '\n' | sort -t':' -k2rn -k1 | tr '\n' ' '))
 
-# Count the number of occurrences of each word in the array.
-word_counts=$(echo $words | awk '{count[$1]++} END {for (word in count) {print word, count[word]}}')
-
-# Sort the word counts in descending order.
-word_counts=$(echo $word_counts | sort -nr)
-
-# Print the word counts.
-for word, count in $word_counts; do
-  echo "$word: $count"
+for word in "${sorted_words[@]}"; do
+  echo "$word"
 done
